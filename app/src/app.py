@@ -13,7 +13,7 @@ def load_config():
     config.read(config_path)
     return config
 
-def main():
+async def main():
     if len(sys.argv) < 2:
         print("Usage: python app.py <send|receive> [message]")
         sys.exit(1)
@@ -39,11 +39,10 @@ def main():
         message = sys.argv[2]
         sb_manager.send_message(message)
     elif command == "receive":
-        messages = sb_manager.receive_messages()
-        for m in messages:
-            print(m)
+        await sb_manager.receive_messages()
     else:
         print("Unknown command. Use 'send' or 'receive'.")
 
 if __name__ == '__main__':
-    main()
+    import asyncio
+    asyncio.run(main())

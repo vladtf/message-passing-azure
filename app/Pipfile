@@ -6,6 +6,7 @@ verify_ssl = true
 [packages]
 azure-servicebus = "*"
 azure-identity = "*"
+aiohttp = "*"
 
 [dev-packages]
 pytest = "*"
