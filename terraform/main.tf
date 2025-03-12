@@ -26,13 +26,23 @@ resource "azurerm_servicebus_topic" "soam_topic" {
   partitioning_enabled = true
 }
 
-# Create a Service Bus Subscription (acts like an SQS queue subscribed to the SNS topic)
+# Create a Service Bus Queue to which messages will be forwarded
+resource "azurerm_servicebus_queue" "soam_queue" {
+  name                = "soam-queue"
+  namespace_id = azurerm_servicebus_namespace.soam.id
+  # (Optional) specify additional queue settings as needed
+}
+
+# Create a Service Bus Subscription that forwards messages to the queue
 resource "azurerm_servicebus_subscription" "soam_subscription" {
   name     = "soam-subscription"
   topic_id = azurerm_servicebus_topic.soam_topic.id
 
   # Configure the maximum delivery attempts before sending the message to the dead-letter queue
   max_delivery_count = 10
+
+  # Forward incoming messages to the queue
+  forward_to = azurerm_servicebus_queue.soam_queue.name
 }
 
 # (Optional) Create an Authorization Rule for the Topic so your application can publish messages

@@ -33,7 +33,25 @@ my-azure-servicebus-app
    pipenv shell
    ```
 
-4. **Use the application:**
+4. **Assign the Azure Service Bus Data Sender and Receiver roles:**
+
+   ```powershell
+   # Variables
+   $subscriptionId = "01810409-8e44-41af-a73f-b47942986098"
+   $resourceGroup = "soam-rg"
+   $namespace = "soam-sb-namespace"
+
+   # Get the signed-in user's object ID
+   $userId = (az ad signed-in-user show --query id -o tsv)
+
+   # Assign the Azure Service Bus Data Sender role
+   az role assignment create --assignee $userId --role "Azure Service Bus Data Sender" --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.ServiceBus/namespaces/$namespace"
+
+   # Assign the Azure Service Bus Data Receiver role
+   az role assignment create --assignee $userId --role "Azure Service Bus Data Receiver" --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.ServiceBus/namespaces/$namespace"
+   ```
+
+5. **Use the application:**
 
    To send a message:
    ```
