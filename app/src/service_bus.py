@@ -43,3 +43,30 @@ class ServiceBusManager:
                         print("Received:", body_bytes)
                     await receiver.complete_message(msg)
         await self.async_credential.close()
+
+    # New helper method to clear all messages from the queue
+    def clear_queue(self):
+        with SyncServiceBusClient(fully_qualified_namespace=self.fully_qualified_namespace, credential=self.sync_credential) as client:
+            receiver = client.get_queue_receiver(queue_name=self.queue_name)
+            with receiver:
+                while True:
+                    messages = receiver.receive_messages(max_message_count=10, max_wait_time=2)
+                    if not messages:
+                        break
+                    for msg in messages:
+                        receiver.complete_message(msg)
+
+    # New helper method to read (consume) all messages from the queue and return them.
+    def read_all_messages(self):
+        all_messages = []
+        with SyncServiceBusClient(fully_qualified_namespace=self.fully_qualified_namespace, credential=self.sync_credential) as client:
+            receiver = client.get_queue_receiver(queue_name=self.queue_name)
+            with receiver:
+                while True:
+                    messages = receiver.receive_messages(max_message_count=10, max_wait_time=2)
+                    if not messages:
+                        break
+                    all_messages.extend(messages)
+                    for msg in messages:
+                        receiver.complete_message(msg)
+        return all_messages

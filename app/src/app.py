@@ -1,6 +1,8 @@
 import sys
 import os
 import configparser
+import threading
+import time
 from service_bus import ServiceBusManager
 
 def load_config():
@@ -15,7 +17,7 @@ def load_config():
 
 async def main():
     if len(sys.argv) < 2:
-        print("Usage: python app.py <send|receive> [message]")
+        print("Usage: python app.py <send|receive|perf> [options]")
         sys.exit(1)
 
     command = sys.argv[1]
@@ -40,8 +42,48 @@ async def main():
         sb_manager.send_message(message)
     elif command == "receive":
         await sb_manager.receive_messages()
+    elif command == "perf":
+        if len(sys.argv) < 5:
+            print("Usage: python app.py perf <threads> <messages_per_thread> 'message prefix'")
+            sys.exit(1)
+        try:
+            threads_count = int(sys.argv[2])
+            messages_per_thread = int(sys.argv[3])
+        except ValueError:
+            print("Threads and messages_per_thread must be integers.")
+            sys.exit(1)
+        base_message = sys.argv[4]
+
+        # Clear the queue before starting performance testing.
+        print("Clearing queue before starting performance testing...")
+        sb_manager.clear_queue()
+
+        def thread_function(thread_id):
+            for i in range(messages_per_thread):
+                msg = f"{base_message} from thread {thread_id} message {i}"
+                sb_manager.send_message(msg)
+
+        threads = []
+        start_time = time.time()
+        for i in range(threads_count):
+            t = threading.Thread(target=thread_function, args=(i,))
+            threads.append(t)
+            t.start()
+
+        for t in threads:
+            t.join()
+        end_time = time.time()
+        total_messages = threads_count * messages_per_thread
+        print(f"Sent {total_messages} messages in {end_time - start_time:.2f} seconds.")
+
+        # Read performance: measure how long it takes to read all messages
+        print("Measuring read performance: reading messages from the queue...")
+        start_read = time.time()
+        messages = sb_manager.read_all_messages()
+        end_read = time.time()
+        print(f"Read {len(messages)} messages in {end_read - start_read:.2f} seconds.")
     else:
-        print("Unknown command. Use 'send' or 'receive'.")
+        print("Unknown command. Use 'send', 'receive', or 'perf'.")
 
 if __name__ == '__main__':
     import asyncio
