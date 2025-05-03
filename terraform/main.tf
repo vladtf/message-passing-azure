@@ -6,7 +6,7 @@ provider "azurerm" {
 # Create a Resource Group
 resource "azurerm_resource_group" "soam" {
   name     = "soam-rg"
-  location = "East US"
+  location = "Germany West Central"
 }
 
 # Create a Service Bus Namespace
@@ -14,13 +14,18 @@ resource "azurerm_servicebus_namespace" "soam" {
   name                = "soam-sb-namespace"
   location            = azurerm_resource_group.soam.location
   resource_group_name = azurerm_resource_group.soam.name
-  sku                 = "Standard"
+  sku                 = "Premium"
+  capacity = 4
+  premium_messaging_partitions = 4
 }
 
 # Create a Service Bus Topic (acts like SNS)
 resource "azurerm_servicebus_topic" "soam_topic" {
   name         = "soam-topic"
   namespace_id = azurerm_servicebus_namespace.soam.id
+
+  # Ensure this resource waits for the namespace to be fully created
+  depends_on = [azurerm_servicebus_namespace.soam]
 
   # Optional: enable partitioning for better scalability
   partitioning_enabled = true
@@ -29,8 +34,13 @@ resource "azurerm_servicebus_topic" "soam_topic" {
 # Create a Service Bus Queue to which messages will be forwarded
 resource "azurerm_servicebus_queue" "soam_queue" {
   name                = "soam-queue"
-  namespace_id = azurerm_servicebus_namespace.soam.id
-  # (Optional) specify additional queue settings as needed
+  namespace_id        = azurerm_servicebus_namespace.soam.id
+
+  # Ensure this resource waits for the namespace to be fully created
+  depends_on = [azurerm_servicebus_namespace.soam]
+
+  # Enable partitioning for compatibility with the partitioned namespace
+  partitioning_enabled = true
 }
 
 # Create a Service Bus Subscription that forwards messages to the queue

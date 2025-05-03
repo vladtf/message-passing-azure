@@ -92,7 +92,7 @@ $resourceGroup = "soam-rg"
 $namespace = "soam-sb-namespace"
 
 # Get the signed-in user's object ID (or use your email directly as the identifier)
-$userId = (az ad signed-in-user show --query objectId -o tsv)
+$userId = (az ad signed-in-user show --query id -o tsv)
 
 # Assign the Azure Service Bus Data Sender role
 az role assignment create --assignee $userId --role "Azure Service Bus Data Sender" --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.ServiceBus/namespaces/$namespace"

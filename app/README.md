@@ -75,11 +75,11 @@ To receive messages from the Service Bus, run:
 python src/app.py receive
 ```
 
-## Running Tests
+## Running Performance Tests
 
 To run the unit tests for the `ServiceBusManager`, use:
 ```
-pytest tests/test_service_bus.py
+python src/app.py perf 2 20  test
 ```
 
 ## License
