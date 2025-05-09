@@ -32,7 +32,7 @@ class AsyncServiceBusManager:
             self._client = AsyncServiceBusClient(
                 fully_qualified_namespace=fully_qualified_namespace,
                 credential=self.async_credential,
-                logging_enable=False,               # for debugging
+                logging_enable=True,               # for debugging
                 transport_type=TransportType.Amqp,  # for Azure Functions
             )
             self._queue_name = queue_name
@@ -93,4 +93,4 @@ class AsyncServiceBusManager:
     async def close(self):
         # Ensure proper cleanup of the ServiceBusClient and credential
         await self._client.close()
-        await self.async_credential.close()  # Explicitly close the credential to avoid unclosed session warnings
+        await self.async_credential.close()

@@ -13,6 +13,7 @@ This project demonstrates a message passing architecture utilizing Azure Service
   - [Python Application Setup](#python-application-setup)
     - [Configuration](#configuration)
     - [Role Assignment](#role-assignment)
+    - [Prerequisites](#prerequisites-1)
     - [Running the Application](#running-the-application)
   - [Running Tests](#running-tests)
 
@@ -100,6 +101,26 @@ az role assignment create --assignee $userId --role "Azure Service Bus Data Send
 # Assign the Azure Service Bus Data Receiver role
 az role assignment create --assignee $userId --role "Azure Service Bus Data Receiver" --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.ServiceBus/namespaces/$namespace"
 ```
+
+### Prerequisites
+
+- **Assign the Azure Service Bus Data Sender and Receiver roles:**
+
+   ```powershell
+   # Variables
+   $subscriptionId = "01810409-8e44-41af-a73f-b47942986098"
+   $resourceGroup = "soam-rg"
+   $namespace = "soam-sb-namespace"
+
+   # Get the signed-in user's object ID
+   $userId = (az ad signed-in-user show --query id -o tsv)
+
+   # Assign the Azure Service Bus Data Sender role
+   az role assignment create --assignee $userId --role "Azure Service Bus Data Sender" --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.ServiceBus/namespaces/$namespace"
+
+   # Assign the Azure Service Bus Data Receiver role
+   az role assignment create --assignee $userId --role "Azure Service Bus Data Receiver" --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.ServiceBus/namespaces/$namespace"
+   ```
 
 ### Running the Application
 
