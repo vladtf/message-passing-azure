@@ -1,18 +1,19 @@
-# Message Passing Performance Project: Technical Report 2
+# Message Passing Performance Project: Technical Report 4
 
 ## Table of Contents
 
-- [Message Passing Performance Project: Technical Report 2](#message-passing-performance-project-technical-report-2)
+- [Message Passing Performance Project: Technical Report 4](#message-passing-performance-project-technical-report-4)
   - [Table of Contents](#table-of-contents)
   - [Code Repository](#code-repository)
   - [System Architecture](#system-architecture)
-    - [What is new in this phase?](#what-is-new-in-this-phase)
+    - [What’s New in This Phase?](#whats-new-in-this-phase)
   - [Implementation Details](#implementation-details)
-    - [What is new in this phase?](#what-is-new-in-this-phase-1)
+    - [What’s New in This Phase?](#whats-new-in-this-phase-1)
   - [Experimental Results](#experimental-results)
     - [Write Test](#write-test)
     - [Read Test](#read-test)
     - [Results](#results)
+    - [Read Performance After Idling](#read-performance-after-idling)
   - [Conclusions](#conclusions)
   - [References](#references)
 
@@ -25,7 +26,8 @@ The code repository for the project is available at [message-passing-azure](http
 
 ## System Architecture
 
-The architecture of the system was described in the previous report. The architecture consists of the following components:
+The system architecture was introduced in the previous report. It consists of the following components:
+
 1. **Azure Service Bus Namespace** – The message broker.
 2. **Service Bus Topic** – Handles published messages.
 3. **Service Bus Queue** – Messages are forwarded here.
@@ -36,9 +38,14 @@ Following is the architecture diagram for the simple message passing system:
 
 <img src="assets/architecture_diagram.png" alt="Architecture Diagram" width="90%" style="border: 1px solid #ccc; padding: 10px; margin: 5px;"/>
 
-### What is new in this phase?
+### What’s New in This Phase?
 
-The architecture did not change significantly since the previous report. The only change is that the Python application was migrated to C# and that Service Bus was upgraded to Premium tier. These changes significantly improved the performance of the system.
+There were no major architectural changes from the previous phase. The key updates are:
+
+* Migration of the Python application to **C#**.
+* Upgrade of Azure Service Bus to the **Premium** tier.
+
+These modifications significantly improved system performance.
 
 
 ## Implementation Details
@@ -56,12 +63,16 @@ resource "azurerm_servicebus_namespace" "soam" {
 }
 ```
 
-Another change was the migration of the Python application to C#. Usage of the `ServiceBusProcessor` improved the performance of the system by allowing multiple messages to be processed concurrently.
+Additionally, the application was rewritten in **C#**, using `ServiceBusProcessor` for improved concurrent message processing.
 
-### What is new in this phase?
+### What’s New in This Phase?
 
-The most significant configuration change was the `PrefetchCount` and `MaxConcurrentCalls` parameters. The `PrefetchCount` parameter allows the receiver to prefetch a specified number of messages from the queue, which can improve performance by reducing the number of round trips to the server. The `MaxConcurrentCalls` parameter allows multiple messages to be processed concurrently, which can also improve performance.
-The following code snippet shows how to configure the `ServiceBusProcessor`:
+The most impactful configuration updates include:
+
+* **`PrefetchCount`** – Enables the receiver to prefetch a specified number of messages, reducing round-trips.
+* **`MaxConcurrentCalls`** – Allows multiple messages to be processed in parallel.
+
+Example configuration:
 
 ```csharp
 var processorOptions = new ServiceBusProcessorOptions
@@ -89,29 +100,34 @@ await sender.SendMessagesAsync(batch);
 
 ## Experimental Results
 
-Because Service Bus is a fully managed service, the performance of the system was evaluated using the following metrics:
-1. **Write Throughput** – The number of messages sent per second.
-2. **Read Throughput** – The number of messages read per second.
-3. **Resource Utilization** – The CPU and memory usage of the Service Bus.
+As Azure Service Bus is a managed service, performance was evaluated using the following metrics:
+
+1. **Write Throughput** – Messages sent per second.
+2. **Read Throughput** – Messages read per second.
+3. **Resource Utilization** – CPU and memory usage of the Service Bus.
 
 ### Write Test
-- I ran a series of tests where different numbers of writer threads (from 1 up to 256) each sent a fixed number of messages.
-- For each test, I measured the elapsed time to send all messages, then calculated the throughput as the total messages sent divided by the elapsed time (messages per second).
-- This test reveals how well the system scales with an increasing number of parallel producers and identifies any bottlenecks in batching and network transmission.
+
+* Conducted tests with varying numbers of writer threads (from 1 to 256), each sending a fixed number of messages.
+* Measured elapsed time to compute throughput (messages/second).
+* Purpose: Assess how system scales with parallel producers and uncover batching or network bottlenecks.
 
 ### Read Test
-- The read test was implemented by varying the number of concurrently processing threads (from 1 up to 4096) using the ServiceBusProcessor.
-- Over a fixed duration (e.g., 10 seconds), I measured the total number of messages successfully received and processed.
-- The throughput was then computed as the number of messages processed per second.
-- This test highlights the scaling behavior of the message consumer.
+
+* Tested scaling with different numbers of concurrent reader threads (from 1 up to 4096), using `ServiceBusProcessor`.
+* For a fixed duration (e.g., 10 seconds), recorded successfully processed messages.
+* Purpose: Understand consumer-side scaling behavior.
 
 ### Results
 
-Following shows the resource utilization of the Service Bus during the performance test:
+**Service Bus resource utilization during tests:**
+
+The memory utilization of the Service Bus reached 90% during the tests, while CPU utilization was around 80%. This indicates that the Service Bus was able to handle the load without any issues. The following graphs show the resource utilization during the tests:
 
 <img src="assets/resource_utilization.png" alt="Resource Utilization" width="90%" style="border: 1px solid #ccc; padding: 10px; margin: 5px;"/>
 
-Write Scaling Results:
+**Write Scaling Results:**
+
 | Threads | Throughput (msg/s) |
 | ------- | ------------------ |
 | 1       | 1736               |
@@ -126,7 +142,10 @@ Write Scaling Results:
 | 512     | 16728              |
 
 
-Read Scaling Results:
+<img src="assets/write_scaling.png" alt="Write Scaling" width="90%" style="border: 1px solid #ccc; padding: 10px; margin: 5px;"/>
+
+**Read Scaling Results:**
+
 | Threads | Throughput (msg/s) |
 | ------- | ------------------ |
 | 1       | 12                 |
@@ -143,12 +162,16 @@ Read Scaling Results:
 | 2048    | 2575               |
 | 4096    | 2280               |
 
+<img src="assets/read_scaling.png" alt="Read Scaling" width="90%" style="border: 1px solid #ccc; padding: 10px; margin: 5px;"/>
 
-One of the most interesting observations was that the read performance decreased during the performance test. The conclusion is that the Service Bus throttles the number of reads. The following table shows the read performance after idling for 30 seconds:
+
+### Read Performance After Idling
+
+After idling for 30 seconds, the read performance showed a noticeable improvement, likely due to reduced throttling by the Service Bus. The results are summarized below:
 
 | Threads | Throughput (msg/s) |
 | ------- | ------------------ |
-|    4096 |               5821 |
+| 4096    | 5821               |
 
 ## Conclusions
 

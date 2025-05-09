@@ -1,4 +1,4 @@
-# Message Passing Performance Project: Technical Report 2
+# Message Passing Performance Project: Technical Report 3
 
 ## Table of Contents
 
