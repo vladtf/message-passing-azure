@@ -214,6 +214,14 @@ img[alt~="center-usage"] {
 
 ---
 
+# Demo
+
+<a href="https://ctipub-my.sharepoint.com/:v:/g/personal/vtiftilov_stud_acs_upb_ro/EcLzh4Rg4JFMjVShfk4GrngB8Ka0rA5GrhXZdABvKVEfrA?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=t8P5tb" target="_blank">
+  <img src="assets/demo.png" alt="center-usage" style="display:block;margin:auto;">
+</a>
+
+---
+
 # Conclusions & Lessons Learned
 
 * Achieved write throughput of **\~16,000 msg/s** and read throughput of **\~5,800 msg/s**.

@@ -37,7 +37,7 @@ my-azure-servicebus-app
 
    ```powershell
    # Variables
-   $subscriptionId = "01810409-8e44-41af-a73f-b47942986098"
+   $subscriptionId = "60344ef8-bcbb-43f9-9d2b-287fd7a054fd"
    $resourceGroup = "soam-rg"
    $namespace = "soam-sb-namespace"
 
