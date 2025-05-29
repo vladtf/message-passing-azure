@@ -10,7 +10,7 @@ marp: true
 
 ![bg left:40% 80%](assets/icon.png)
 
-## **Message Passing Performance Project**
+## **Azure Service Bus - Message Passing Performance**
 
 ##### Author: Vladislav Tiftilov
 
@@ -21,6 +21,17 @@ marp: true
 * **Objective:** Evaluate and optimize message-passing performance using Azure Service Bus.
 * **Context:** Integration into Smart City middleware platform.
 * **Goal:** High-throughput, low-latency communication between sensors and middleware components.
+
+---
+
+# Existing Solutions Comparison
+
+| System   | Strengths                         | Weaknesses                   |
+| -------- | --------------------------------- | ---------------------------- |
+| Kafka    | High throughput, scalable         | Complex, resource-intensive  |
+| SNS/SQS  | Managed, scalable, fault-tolerant | Vendor lock-in               |
+| MQTT     | Lightweight, ideal for IoT        | No built-in persistence |
+| Azure SB | Durable, Azure integrated         | Tier-based throughput limits |
 
 ---
 
@@ -40,7 +51,7 @@ marp: true
 * Optimized for event-driven messaging
 * Supports asynchronous processing
 * Good integration with Azure ecosystem
-* Provides enterprise-grade durability
+* Fully managed service
 
 ---
 
@@ -123,17 +134,6 @@ resource "azurerm_servicebus_subscription" "soam_subscription" {
 
 **Conclusion:** Functional, but initial low performance.
 
----
-
-# Existing Solutions Comparison
-
-| System   | Strengths                         | Weaknesses                   |
-| -------- | --------------------------------- | ---------------------------- |
-| Kafka    | High throughput, scalable         | Complex, resource-intensive  |
-| RabbitMQ | Flexible, mature protocol         | Performance under heavy load |
-| SNS/SQS  | Managed, scalable, fault-tolerant | Vendor lock-in               |
-| MQTT     | Lightweight, ideal for IoT        | Limited throughput           |
-| Azure SB | Durable, Azure integrated         | Configuration overhead       |
 
 ---
 
@@ -224,7 +224,7 @@ img[alt~="center-usage"] {
 
 # Conclusions & Lessons Learned
 
-* Achieved write throughput of **\~16,000 msg/s** and read throughput of **\~5,800 msg/s**.
+* Achieved write throughput of **\~16,000 msg/s** and read throughput of **\~5,800 msg/s** (after idle time).
 * Message batching and concurrency greatly improved performance.
 * Premium tier Azure Service Bus provided significant scaling benefits.
 
