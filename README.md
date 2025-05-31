@@ -1,6 +1,6 @@
 # Message Passing Performance Project
 
-This project demonstrates a message passing architecture utilizing Azure Service Bus. Infrastructure is provisioned using Terraform, and a Python application is provided for sending and receiving messages.
+This project demonstrates a message passing architecture utilizing Azure Service Bus. Infrastructure is provisioned using Terraform, and both Python and C# applications are provided for sending and receiving messages.
 
 ## Table of Contents
 
@@ -15,6 +15,10 @@ This project demonstrates a message passing architecture utilizing Azure Service
     - [Role Assignment](#role-assignment)
     - [Prerequisites](#prerequisites-1)
     - [Running the Application](#running-the-application)
+  - [C# Application Setup](#c-application-setup)
+    - [Configuration](#configuration-1)
+    - [Role Assignment](#role-assignment-1)
+    - [Running the Application](#running-the-application-1)
   - [Running Tests](#running-tests)
 
 
@@ -22,8 +26,23 @@ This project demonstrates a message passing architecture utilizing Azure Service
 
 ```
 message-passing-perf
-├── app                         # Python application for sending and receiving messages  
-└── terraform                   # Terraform configuration for provisioning Azure resources
+├── app/                # Python application for sending and receiving messages
+│   ├── src/
+│   ├── config.ini
+│   ├── Pipfile
+│   ├── Pipfile.lock
+│   └── README.md
+├── app-csharp/         # C# application for Azure Service Bus performance testing
+│   ├── Program.cs
+│   ├── appsettings.json
+│   ├── app-csharp.csproj
+│   └── README.md
+├── terraform/          # Terraform configuration for provisioning Azure resources
+│   └── main.tf
+├── docs/               # Documentation and diagrams
+│   └── ...
+├── README.md           # Main project documentation (this file)
+└── message-passing-perf.sln # Solution file for C#
 ```
 
 ## Prerequisites
@@ -32,6 +51,7 @@ message-passing-perf
 - **Terraform:** [Terraform CLI](https://www.terraform.io/downloads.html).
 - **Azure CLI:** [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) (must be logged in with `az login`).
 - **Pipenv:** [Pipenv](https://pipenv.pypa.io/en/latest/) for managing Python environments.
+- **.NET 8.0 SDK:** Required for the C# application ([.NET download](https://dotnet.microsoft.com/download)).
 
 ## Terraform Infrastructure Setup
 
@@ -144,6 +164,53 @@ az role assignment create --assignee $userId --role "Azure Service Bus Data Rece
    This command reads messages from the queue and displays them.
    ```
    python src/app.py receive
+   ```
+
+## C# Application Setup
+
+The C# application provides a performance test for Azure Service Bus, mirroring the Python application's functionality.
+
+### Configuration
+
+Edit the `appsettings.json` file in the `app-csharp` folder to specify your Service Bus settings (namespace, topic, subscription, queue, etc.).
+
+### Role Assignment
+
+Before running the C# application, ensure your account (or the service principal) has the following roles on the Service Bus namespace:
+- **Azure Service Bus Data Sender**
+- **Azure Service Bus Data Receiver**
+
+You can assign these roles using the Azure CLI:
+```powershell
+$subscriptionId = "<your-subscription-id>"
+$resourceGroup = "<your-resource-group>"
+$namespace = "<your-servicebus-namespace>"
+$userId = (az ad signed-in-user show --query id -o tsv)
+az role assignment create --assignee $userId --role "Azure Service Bus Data Sender" --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.ServiceBus/namespaces/$namespace"
+az role assignment create --assignee $userId --role "Azure Service Bus Data Receiver" --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.ServiceBus/namespaces/$namespace"
+```
+
+### Running the Application
+
+1. Navigate to the `app-csharp` folder:
+   ```powershell
+   cd app-csharp
+   ```
+2. Restore dependencies:
+   ```powershell
+   dotnet restore
+   ```
+3. Build the project:
+   ```powershell
+   dotnet build
+   ```
+4. Run the performance test:
+   ```powershell
+   dotnet run -- <messages_per_thread> <message_prefix> <mode(write/read/both)>
+   ```
+   For example, to send 1000 messages per thread with prefix `test` in both write and read modes:
+   ```powershell
+   dotnet run -- 1000 test both
    ```
 
 ## Running Tests
