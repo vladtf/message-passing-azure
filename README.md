@@ -19,7 +19,6 @@ This project demonstrates a message passing architecture utilizing Azure Service
     - [Configuration](#configuration-1)
     - [Role Assignment](#role-assignment-1)
     - [Running the Application](#running-the-application-1)
-  - [Running Tests](#running-tests)
 
 
 ## Project Structure
@@ -216,12 +215,3 @@ az role assignment create --assignee $userId --role "Azure Service Bus Data Rece
    ```powershell
    dotnet run -- 1000 test both
    ```
-
-## Running Tests
-
-To run the unit tests for the Python application, execute:
-```
-pytest tests/test_service_bus.py
-```
-
-

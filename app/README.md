@@ -63,6 +63,15 @@ my-azure-servicebus-app
    python src/app.py receive
    ```
 
+   To run a performance test (provide all required parameters):
+   ```
+   python src/app.py perf <threads> <messages_per_thread> <message_prefix>
+   ```
+   For example:
+   ```
+   python src/app.py perf 2 20 test
+   ```
+
 ## Usage
 
 To send a message to the Service Bus, run the following command:
@@ -75,13 +84,11 @@ To receive messages from the Service Bus, run:
 python src/app.py receive
 ```
 
-## Running Performance Tests
-
-To run the unit tests for the `ServiceBusManager`, use:
+To run a performance test, use:
 ```
-python src/app.py perf 2 20  test
+python src/app.py perf <threads> <messages_per_thread> <message_prefix>
 ```
-
-## License
-
-This project is licensed under the MIT License.
+For example:
+```
+python src/app.py perf 2 20 test
+```
