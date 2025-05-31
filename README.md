@@ -39,8 +39,12 @@ message-passing-perf
 │   └── README.md
 ├── terraform/          # Terraform configuration for provisioning Azure resources
 │   └── main.tf
-├── docs/               # Documentation and diagrams
-│   └── ...
+├── docs/               # Documentation, architecture diagrams, presentations, and demo videos
+│   ├── presentation.md         # Project presentation in Markdown
+│   ├── presentation.pdf        # Project presentation in PDF
+│   ├── demo-ad.mp4             # Demo video
+│   ├── Vladislav_Tiftilov-*.md # Detailed architecture and analysis documents
+│   └── assets/                 # Images and diagrams (architecture, scaling, monitoring, etc.)
 ├── README.md           # Main project documentation (this file)
 └── message-passing-perf.sln # Solution file for C#
 ```
